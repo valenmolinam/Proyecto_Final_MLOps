@@ -208,6 +208,7 @@ __marimo__/
 
 # Ignorar datasets
 data/*.csv
+*.csv
 
 # Entornos virtuales
 .venv/
