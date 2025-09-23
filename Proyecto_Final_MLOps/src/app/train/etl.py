@@ -1,25 +1,26 @@
 import pandas as pd
+import numpy as np
+import kagglehub
 
-def load_data(path):
-    return pd.read_csv(path)
 
-def clean_data(df):
-    # ejemplo de limpieza
-    df = df.drop_duplicates()
-    df = df.dropna(subset=["columna_importante"])
-    return df
+class Dataloader:
+    def __init__(self, path_to_save, n_samples=100000):
+        self.df = None
+        self.path_to_save = path_to_save
+        self.n_samples = n_samples
 
-def transform_data(df):
-    # ejemplo de transformación
-    df["nueva_variable"] = df["columna1"] / df["columna2"]
-    return df
+    def download_data(self):
+        path = kagglehub.dataset_download("data/ealaxi/paysim1", self.path_to_save)
+        return path
 
-def run_etl(path):
-    df = load_data(path)
-    df = clean_data(df)
-    df = transform_data(df)
-    return df
-
-if __name__ == "__main__":
-    df_final = run_etl("data/tu_dataset.csv")
-    print(df_final.head())
+    def load_data(self):
+        if self.path_to_save:
+            self.df = pd.read_csv(self.path_to_save, nrows=self.n_samples)
+        else:
+            downloaded_path = self.download_data()
+            self.df = pd.read_csv(downloaded_path, nrows=self.n_samples)
+        return self.df
+    
+    def drop_name_columns(self):
+        if self.df is not None:
+            self.df.drop(['nameOrig', 'nameDest', 'isFlaggedFraud'], axis=1, inplace=True)
