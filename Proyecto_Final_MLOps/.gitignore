@@ -216,3 +216,11 @@ __pycache__/
 
 # Jupyter
 .ipynb_checkpoints/
+
+# MLflow artifacts
+mlruns/
+mlartifacts/
+backend.db
+
+# Entorno virtual
+.venv/
