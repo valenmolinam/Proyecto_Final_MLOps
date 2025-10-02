@@ -8,4 +8,9 @@ dependencies = [
     "ipykernel>=6.30.1",
     "kagglehub>=0.3.13",
     "pandas>=2.3.2",
+    "scikit-learn",
+    "mlflow",
+    "lightgbm",
+    "xgboost",
+    "prefect",
 ]

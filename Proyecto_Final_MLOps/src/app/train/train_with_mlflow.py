@@ -98,8 +98,9 @@ class TrainWithMLflow:
             print(f"MLflow Run ID: {run_id}")
             print(f"Tracking URI: {mlflow.get_tracking_uri()}")
             print(f"Train Accuracy: {train_metrics['train_accuracy']:.4f}")
-            Print(f"Test Accuracy: {test_metrics['test_accuracy']:.4f}")
-
+            print(f"Test Accuracy: {test_metrics['test_accuracy']:.4f}")
+            
+            mlflow.sklearn.log_model(pipeline, "model")
             return pipeline, run_id
 
     def calculate_metrics(self, y_true, y_pred, prefix=""):
@@ -149,4 +150,5 @@ class TrainWithMLflow:
             print(f"Train Accuracy: {train_metrics['train_accuracy']:.4f}")
             print(f"Test Accuracy: {test_metrics['test_accuracy']:.4f}")
 
+            mlflow.sklearn.log_model(pipeline, "model")
             return pipeline, run_id
