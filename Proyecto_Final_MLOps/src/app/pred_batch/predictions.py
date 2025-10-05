@@ -1,3 +1,8 @@
+from mlflow.tracking import MlflowClient
+
+client = MlflowClient()
+for mv in client.search_model_versions("name='Mejor modelo'"):
+    print(f"Version: {mv.version}, Stage: {mv.current_stage}, Run ID: {mv.run_id}")
 
 import mlflow
 from mlflow.tracking import MlflowClient
@@ -34,18 +39,12 @@ def get_model():
             )
 
 def get_etl_data():
-    dataloader = Dataloader(path_to_save="data", n_samples=100000)
+    dataloader = Dataloader(path_to_save="data/pred_batch.csv", n_samples=100000)
     dataset_path = dataloader.download_data()
     df = dataloader.load_data()
     return df
 
 def get_features(df):
-    feature_engineer = add_features(df)
-    df = feature_engineer.preprocess_data()
-    return df
-
-def get_data():
-    df = get_etl_data()
     feature_engineer = add_features(df)
     df = feature_engineer.preprocess_data()
     return df
@@ -57,25 +56,44 @@ def save_prediction(df, prediction):
     df["prediction"] = prediction[:, 1]
     df["prediction"] = df["prediction"].astype(int)
     df["prediction"] = df["prediction"].map({0: "No", 1: "Si"})
-    df.to_csv('predictions/predictions.csv', index=False)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    save_dir = os.path.join(base_dir, "predictions")
+
+    file_path = os.path.join(save_dir, "predictions.csv")
+    df.to_csv(file_path, index=False)
+
+    print(f"✅ Predicciones guardadas en: {file_path}")
+    return df 
+
+from etl import Dataloader
+
+def get_etl_data():
+    dataloader = Dataloader(path_to_save="C:/Users/Valentina Molina/Documents/Repositorios/Proyecto_Final_MLOps/data/PS_20174392719_1491204439457_log.csv")
+    df = dataloader.load_data()
+    dataloader.drop_name_columns()
     return df
 
-def save_prediction_proba(df, prediction):
-    df["prediction_0"] = prediction[:, 0]
-    df["prediction_1"] = prediction[:, 1]
-    df["prediction_0"] = df["prediction_0"].astype(int)
-    df["prediction_1"] = df["prediction_1"].astype(int)
-    df["prediction_0"] = df["prediction_0"].map({0: "No", 1: "Si"})
-    df["prediction_1"] = df["prediction_1"].map({0: "No", 1: "Si"})
-    df.to_csv('predictions/predictions_proba.csv', index=False)
-    return df
+import os
 
-def main():
-    model = get_model()
-    df = get_etl_data()
-    prediction = predict(model, df)
-    #save_prediction(df, prediction)
-    save_prediction_proba(df, prediction)
+base_dir = os.path.dirname(os.path.abspath(__file__))
+predictions_dir = os.path.join(base_dir, "predictions")
 
-if __name__ == "__main__":
-    main()
+print("Archivos en carpeta predictions:",
+      os.listdir(predictions_dir) if os.path.exists(predictions_dir) else "Carpeta no existe")
+
+model = get_model()
+
+model
+
+df = get_etl_data()
+
+from feature_engineer import add_features
+df = add_features(df)
+df.head()
+
+prediction = predict(model, df)
+prediction
+
+prediction_array = prediction[:, 1]
+
+save_prediction(df, prediction)
